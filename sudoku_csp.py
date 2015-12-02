@@ -343,7 +343,7 @@ def picross_model(picross_constraints):
     for cellj in range(len(picross_constraints[0])):
         column = []
         for celli in range(len(picross_constraints[1])):
-            column.append(vars[celli*9+cellj])
+            column.append(vars[celli*len(picross_constraints[0])+cellj])
         con = Constraint("C(Column{})".format(str(cellj)),column)
 
         column_cons_input = column_list[cellj]
