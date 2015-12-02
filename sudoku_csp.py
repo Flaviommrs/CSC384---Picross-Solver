@@ -337,6 +337,11 @@ def picross_model(picross_constraints):
         num_boxes = len(column_cons_input) + 1
 
         #IMPLEMENT HERE THE CONSTRAINTS
+        boxes = list()
+        for i in num_boxes:
+            boxes.append([])
+
+        for i in range num_remaining_falses + 1:
 
 
 
