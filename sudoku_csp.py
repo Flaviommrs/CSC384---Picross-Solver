@@ -337,6 +337,7 @@ def picross_model(picross_constraints):
         num_boxes = len(column_cons_input) + 1
 
         #IMPLEMENT HERE THE CONSTRAINTS
+
         boxes = list()
         for i in num_boxes:
             boxes.append([])
@@ -348,6 +349,24 @@ def picross_model(picross_constraints):
         picross_csp.add_constraint(c)
 
     return picross_csp, variable_array
+
+def create_pic_tupples(total, buckets,tups, tup = tuple()):
+
+    if buckets == 1:
+        tup = tup + (total,)
+        tups.append(tup)
+    else:
+        i = 0
+        aux_total = total
+        buckets -= 1
+        while i <= total:
+            tup = tup + (i,)
+            total -= i
+            create_pic_tupples(total, buckets, tups, tup)
+            total = aux_total
+            i += 1
+
+
 
 
 
