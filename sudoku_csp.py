@@ -291,6 +291,61 @@ def sudoku_csp_model_2(initial_sudoku_board):
 
 #IMPLEMENT
 
+def picross_model(picross_constraints):
+    '''
+    DOCUMENT PICROSS MODEL
+    '''
+    dom = [True,False]
+
+
+    variable_array = []
+    vars = []
+    for i in Range(9):
+        var_line=[]
+        for j in Range(9):
+            vars.append(Variable('Cell {}-{}'.format(i,j), dom))
+            var_line.append(vars[-1])
+        variable_array.append(var_line)
+
+
+    cons = []
+
+    #9 constraints for columns
+    column_list = picross_constraints[0]
+
+    for cellj in range(9):
+        column = []
+        for celli in range(9):
+            column.append(vars[celli*9+cellj])
+        con = Constraint("C(Column{})".format(str(cellj)),column)
+
+        sat_tuples = list()
+
+        column_cons_input = column_list[cellj]
+        list_initial_sat = list()
+
+        element = 0
+        for number in column_cons_input:
+            if(element != 0):
+                list_initial_sat.append(False)
+            for i in range(number):
+                list_initial_sat.append(True)
+            element += 1
+
+        num_remaining_falses = len(column_list) - len(list_initial_sat)
+
+        num_boxes = len(column_cons_input) + 1
+
+        #IMPLEMENT HERE THE CONSTRAINTS
+
+
+
+    picross_csp = CSP("Picross Solver Model", vars)
+    for c in cons:
+        picross_csp.add_constraint(c)
+
+    return picross_csp, variable_array
+
 
 
 
