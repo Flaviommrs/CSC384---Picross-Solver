@@ -337,7 +337,7 @@ def picross_model(picross_constraints):
 
     cons = []
 
-    #9 constraints for columns
+    #constraints for columns
     column_list = picross_constraints[0]
 
     for cellj in range(len(picross_constraints[0])):
@@ -391,7 +391,7 @@ def picross_model(picross_constraints):
         con.add_satisfying_tuples(sat_tuples)
         cons.append(con)
 
-    #9 constraints for lines
+    #constraints for lines
     line_list = picross_constraints[1]
 
     for celli in range(len(picross_constraints[1])):
@@ -443,6 +443,8 @@ def picross_model(picross_constraints):
             sat_tuples.append(tuple(list_initial_sat_copy))
 
         con.add_satisfying_tuples(sat_tuples)
+        print("sat_tuples:")
+        print(sat_tuples)
         cons.append(con)
 
     picross_csp = CSP("Picross Solver Model", vars)
