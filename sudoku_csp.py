@@ -1,5 +1,5 @@
 #Look for #IMPLEMENT tags in this file. These tags indicate what has
-#to be implemented to complete the warehouse domain.  
+#to be implemented to complete the warehouse domain.
 
 '''
 Construct and return sudoku CSP models.
@@ -58,7 +58,7 @@ def has_con_mod1(celli, cellj):
     return False
 
 def sudoku_csp_model_1(initial_sudoku_board):
-    '''Return a CSP object representing a sudoku CSP problem along 
+    '''Return a CSP object representing a sudoku CSP problem along
        with an array of variables for the problem. That is return
 
        sudoku_csp, variable_array
@@ -77,15 +77,15 @@ def sudoku_csp_model_1(initial_sudoku_board):
        you built to represent the value to be placed in cell i,j of
        the sudokup board (indexed from (0,0) to (8,8))
 
-       
-       
+
+
        The input board is specified as a list of 9 lists. Each of the
        9 lists represents a row of the board. If a 0 is in the list it
        represents an empty cell. Otherwise if a number between 1--9 is
        in the list then this represents a pre-set board
        position. E.g., the board
-    
-       -------------------  
+
+       -------------------
        | | |2| |9| | |6| |
        | |4| | | |1| | |8|
        | |7| |4|2| | | |3|
@@ -97,7 +97,7 @@ def sudoku_csp_model_1(initial_sudoku_board):
        | |2| | |8| |1| | |
        -------------------
        would be represented by the list of lists
-       
+
        [[0,0,2,0,9,0,0,6,0],
        [0,4,0,0,0,1,0,0,8],
        [0,7,0,4,2,0,0,0,3],
@@ -107,13 +107,13 @@ def sudoku_csp_model_1(initial_sudoku_board):
        [1,0,0,0,5,7,0,4,0],
        [6,0,0,9,0,0,0,2,0],
        [0,2,0,0,8,0,1,0,0]]
-       
-       
+
+
        This routine returns Model_1 which consists of a variable for
        each cell of the board, with domain equal to {1-9} if the board
        has a 0 at that position, and domain equal {i} if the board has
        a fixed number i at that cell.
-       
+
        Model_1 also contains BINARY CONSTRAINTS OF NOT-EQUAL between
        all relevant variables (e.g., all pairs of variables in the
        same row, etc.), then invoke enforce_gac on those
@@ -170,13 +170,13 @@ def sudoku_csp_model_1(initial_sudoku_board):
         sudoku_csp.add_constraint(c)
 
     return sudoku_csp, variable_array
-    
+
 #IMPLEMENT
 
 ##############################
 
 def sudoku_csp_model_2(initial_sudoku_board):
-    '''Return a CSP object representing a sudoku CSP problem along 
+    '''Return a CSP object representing a sudoku CSP problem along
        with an array of variables for the problem. That is return
 
        sudoku_csp, variable_array
@@ -197,7 +197,7 @@ def sudoku_csp_model_2(initial_sudoku_board):
 
     The input board takes the same input format (a list of 9 lists
     specifying the board as sudoku_csp_model_1.
-    
+
     The variables of model_2 are the same as for model_1: a variable
     for each cell of the board, with domain equal to {1-9} if the
     board has a 0 at that position, and domain equal {i} if the board
@@ -327,9 +327,9 @@ def picross_model(picross_constraints):
 
     variable_array = []
     vars = []
-    for i in range(9):
+    for i in range(len(picross_constraints[1])):
         var_line=[]
-        for j in range(9):
+        for j in range(len(picross_constraints[0])):
             vars.append(Variable('Cell {}-{}'.format(i,j), dom))
             var_line.append(vars[-1])
         variable_array.append(var_line)
@@ -340,13 +340,11 @@ def picross_model(picross_constraints):
     #9 constraints for columns
     column_list = picross_constraints[0]
 
-    for cellj in range(9):
+    for cellj in range(len(picross_constraints[0])):
         column = []
-        for celli in range(9):
+        for celli in range(len(picross_constraints[1])):
             column.append(vars[celli*9+cellj])
         con = Constraint("C(Column{})".format(str(cellj)),column)
-
-        sat_tuples = list()
 
         column_cons_input = column_list[cellj]
         list_initial_sat = list()
@@ -373,6 +371,8 @@ def picross_model(picross_constraints):
         for i in range(num_boxes):
             boxes.append([])
 
+        sat_tuples = list()
+
         for result in all_combinations(num_remaining_falses,boxes):
             list_initial_sat_copy = list(list_initial_sat)
             global_offset = 0
@@ -384,9 +384,12 @@ def picross_model(picross_constraints):
                     local_offset+=1
                 global_offset+=local_offset
                 bucket_num+=1
-            print(list_initial_sat_copy)
 
+            #print(list_initial_sat_copy)
+            sat_tuples.append(tuple(list_initial_sat_copy))
 
+        con.add_satisfying_tuples(sat_tuples)
+        cons.append(con)
 
     picross_csp = CSP("Picross Solver Model", vars)
     for c in cons:
@@ -394,5 +397,20 @@ def picross_model(picross_constraints):
 
     return picross_csp, variable_array
 
+'''
+def create_pic_tupples(total, buckets,tups, tup = tuple()):
 
-
+    if buckets == 1:
+        tup = tup + (total,)
+        tups.append(tup)
+    else:
+        i = 0
+        aux_total = total
+        buckets -= 1
+        while i <= total:
+            tup = tup + (i,)
+            total -= i
+            create_pic_tupples(total, buckets, tups, tup)
+            total = aux_total
+            i += 1
+'''
