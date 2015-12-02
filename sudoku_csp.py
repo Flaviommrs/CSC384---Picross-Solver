@@ -10,6 +10,33 @@ import itertools
 import propagators as my_propagators
 import copy
 
+def all_combinations_aux(sum, buckets):
+    if(sum == 0):
+        yield buckets
+    elif(len(buckets) == 1):
+        buckets[0] = list()
+        buckets[0].append(sum)
+        yield buckets
+    else:
+        middle = len(buckets)//2
+        b1 = sum
+        while(b1 >= 0):
+            for result1 in all_combinations_aux(b1,buckets[:middle]):
+                for result2 in all_combinations_aux(sum-b1,buckets[middle:]):
+                    result = result1 + result2
+                    yield result
+            b1-=1
+
+def all_combinations(sum, buckets):
+    for combination in all_combinations_aux(sum,buckets):
+        for bucket in combination:
+            if len(bucket) == 0:
+                bucket.append(0)
+        yield combination
+
+
+
+
 def same_group(i,j):
     return (i<=3 and j<=3) or (i>3 and i<=6 and j>3 and j<=6) or (i>6 and j>6)
 
@@ -324,22 +351,40 @@ def picross_model(picross_constraints):
         column_cons_input = column_list[cellj]
         list_initial_sat = list()
 
+        bucket_locations=list()
+        location = 0
         element = 0
         for number in column_cons_input:
+            bucket_locations.append(location)
+            location+=number
             if(element != 0):
+                location+=1
                 list_initial_sat.append(False)
             for i in range(number):
                 list_initial_sat.append(True)
             element += 1
+        bucket_locations.append(location)
 
         num_remaining_falses = len(column_list) - len(list_initial_sat)
 
         num_boxes = len(column_cons_input) + 1
 
-        #IMPLEMENT HERE THE CONSTRAINTS
         boxes = list()
-        for i in num_boxes:
+        for i in range(num_boxes):
             boxes.append([])
+
+        for result in all_combinations(num_remaining_falses,boxes):
+            list_initial_sat_copy = list(list_initial_sat)
+            global_offset = 0
+            bucket_num = 0
+            for bucket in result:
+                local_offset = 0
+                for i in range(bucket[0]):
+                    list_initial_sat_copy.insert(global_offset+bucket_locations[bucket_num],False)
+                    local_offset+=1
+                global_offset+=local_offset
+                bucket_num+=1
+            print(list_initial_sat_copy)
 
 
 
@@ -351,5 +396,3 @@ def picross_model(picross_constraints):
 
 
 
-
-    
