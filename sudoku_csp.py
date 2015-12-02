@@ -300,9 +300,9 @@ def picross_model(picross_constraints):
 
     variable_array = []
     vars = []
-    for i in Range(9):
+    for i in range(9):
         var_line=[]
-        for j in Range(9):
+        for j in range(9):
             vars.append(Variable('Cell {}-{}'.format(i,j), dom))
             var_line.append(vars[-1])
         variable_array.append(var_line)
@@ -340,8 +340,6 @@ def picross_model(picross_constraints):
         boxes = list()
         for i in num_boxes:
             boxes.append([])
-
-        for i in range num_remaining_falses + 1:
 
 
 
