@@ -6,7 +6,13 @@ from sudoku_csp import *
 
 def print_Picross(variables):
     for row in variables:
-        print(["T" if var.get_assigned_value() == True else "F" for var in row])
+        #print(["T" if var.get_assigned_value() == True else "F" for var in row])
+        for variable in row:
+            if(variable.get_assigned_value()):
+                print("XX",end="")
+            else:
+                print("  ",end="")
+        print("")
 
 if __name__ == "__main__":
 
