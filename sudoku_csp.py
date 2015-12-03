@@ -339,6 +339,7 @@ def picross_model(picross_constraints):
 
     #constraints for columns
     column_list = picross_constraints[0]
+    line_list = picross_constraints[1]
 
     for cellj in range(len(picross_constraints[0])):
         column = []
@@ -363,7 +364,7 @@ def picross_model(picross_constraints):
             element += 1
         bucket_locations.append(location)
 
-        num_remaining_falses = len(column_list) - len(list_initial_sat)
+        num_remaining_falses = len(line_list) - len(list_initial_sat)
 
         num_boxes = len(column_cons_input) + 1
 
@@ -392,7 +393,6 @@ def picross_model(picross_constraints):
         cons.append(con)
 
     #constraints for lines
-    line_list = picross_constraints[1]
 
     for celli in range(len(picross_constraints[1])):
         line = []
@@ -417,7 +417,7 @@ def picross_model(picross_constraints):
             element += 1
         bucket_locations.append(location)
 
-        num_remaining_falses = len(line_list) - len(list_initial_sat)
+        num_remaining_falses = len(column_list) - len(list_initial_sat)
 
         num_boxes = len(line_cons_input) + 1
 

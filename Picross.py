@@ -9,15 +9,18 @@ def print_Picross(variables):
         #print(["T" if var.get_assigned_value() == True else "F" for var in row])
         for variable in row:
             if(variable.get_assigned_value()):
-                print("XX",end="")
+                print("X",end="")
             else:
-                print("  ",end="")
+                print("_",end="")
         print("")
 
 if __name__ == "__main__":
 
     # Picross board: First the columns list, Second the row list
+    #GOOMBA
     board = [[[5,2],[9,3],[1,2,1,3],[1,1,5],[3,1,1,3],[4,2,1,1,2],[6,2,1,1],[9,1,1],[6,2,1,1],[4,2,1,1,2],[3,1,1,3],[1,1,5],[1,2,1,3],[9,3],[5,2]],[[5],[7],[13],[1,7,1],[1,3,1],[2,5,2],[2,1,1,1,2],[3,3,3],[15],[2,2],[13],[1,1],[4,4],[15],[6,6]]]
+    #EDGE
+    #board = [[[1],[3],[1],[2,2],[2],[4],[1],[3],[3],[1]],[[1],[3],[1],[2],[1],[3],[3],[1],[2],[2],[4]]]
 
     csp, variable_array = picross_model(board)
     solver  = BT(csp)
