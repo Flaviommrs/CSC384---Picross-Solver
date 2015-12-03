@@ -443,8 +443,8 @@ def picross_model(picross_constraints):
             sat_tuples.append(tuple(list_initial_sat_copy))
 
         con.add_satisfying_tuples(sat_tuples)
-        print("sat_tuples:")
-        print(sat_tuples)
+        #print("sat_tuples:")
+        #print(sat_tuples)
         cons.append(con)
 
     picross_csp = CSP("Picross Solver Model", vars)
