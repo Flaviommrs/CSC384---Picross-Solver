@@ -391,6 +391,7 @@ def picross_model(picross_constraints):
 
         con.add_satisfying_tuples(sat_tuples)
         cons.append(con)
+        print("did a constraint for column")
 
     #constraints for lines
 
@@ -446,6 +447,7 @@ def picross_model(picross_constraints):
         #print("sat_tuples:")
         #print(sat_tuples)
         cons.append(con)
+        print("did a constraint for line")
 
     picross_csp = CSP("Picross Solver Model", vars)
     for c in cons:
