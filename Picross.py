@@ -3,74 +3,30 @@ __author__ = 'FlavioMatheus'
 from propagators import *
 from cspbase import *
 from sudoku_csp import *
-import struct
-from math import ceil, hypot
+import struct, array
 
-#based on http://testfrenzy.com/games/mandelbrot/bmp.py
-def write_BMP(filename, width, height, palette, bitarray):
-    # open file
+def write_to_file(filename, width, height, pixels):
     f = open(filename, "wb")
 
-    # write bitmap header
-    f.write( bytes("BM",'UTF-8') )
-    f.write( longToString( 54 + 256*4 + width*height ) )   # DWORD size in bytes of the file
-    f.write( longToString( 0 ) )    # DWORD 0
-    f.write( longToString( 54 + 256*4 ) )    # DWORD offset to the data
-    f.write( longToString( 40 ) )    # DWORD header size = 40
-    f.write( longToString( width ) )    # DWORD image width
-    f.write( longToString( height ) )    # DWORD image height
-    f.write( shortToString( 1 ) )    # WORD planes = 1
-    f.write( shortToString( 8 ) )    # WORD bits per pixel = 8
-    f.write( longToString( 0 ) )    # DWORD compression = 0
-    f.write( longToString( width*height ) )    # DWORD sizeimage = size in bytes of the bitmap = width * height
-    f.write( longToString( 0 ) )    # DWORD horiz pixels per meter (?)
-    f.write( longToString( 0 ) )    # DWORD ver pixels per meter (?)
-    f.write( longToString( 256 ) )    # DWORD number of colors used = 256
-    f.write( longToString( len(palette) ) )    # DWORD number of "import colors = len( self.palette )
+    f.write(b"P3\n")
+    f.write(b"#TESTING PNM FORMAT FOR SAVING")
+    f.write(bytes(str(width) + str(height),'UTF-8'))
+    f.write(b"\n")
+    f.write(bytes(str(256),'UTF-8'))
+    f.write(b"\n")
+    i=-1
+    for pixel in pixels:
+        i+=1
+        if(i>width):
+            i=0
+            f.write(b"\n")
+        f.write(bytes(str(pixel[0])+str(" ")+str(pixel[1])+str(" ")+str(pixel[2]),'UTF-8'))
 
-    # write bitmap palette
-    for clr in palette:
-      f.write( longToString( clr ) )
-
-
-    for i in range( len(palette), 256 ):
-      f.write( longToString( 0 ) )
-
-    # write pixels
-    for row in bitarray:
-      for pixel in row:
-        f.write( bytes(chr(pixel),'UTF-8') )
-      padding = ( 4 - len(row) % 4 ) % 4
-      for i in range(padding):
-        f.write( b'\x00' )
-
-    # close file
     f.close()
+
 
 def rgba(r, g, b, a):
     return (struct.pack("B",r) + struct.pack("B",g) + struct.pack("B",b) + struct.pack("B",a))
-
-def color_toLong(red,grn,blu):
-    return ( ( int(blu) ) +
-              ( int(grn) <<  8 ) +
-              ( int(red) << 16 ) )
-
-def longToString (a):
-    return bytes(longToString2(a),'UTF-8')
-
-def shortToString (a):
-    return bytes(shortToString2(a), 'UTF-8')
-
-def shortToString2(i):
-  hi = (i & 0xff00) >> 8
-  lo = i & 0x00ff
-  return chr(lo) + chr(hi)
-
-def longToString2(i):
-  hi = (int(i) & 0x7fff0000) >> 16
-  lo = int(i) & 0x0000ffff
-  return shortToString2(lo) + shortToString2(hi)
-
 
 #this solver is not for color picrosses you find normally. It solves the different collors as separate problems and then it merges the results.
 def color_picross_basic_solver(picross_constraints, color_list):
@@ -88,14 +44,15 @@ def color_picross_basic_solver(picross_constraints, color_list):
         print_Picross(variable_arrayL[i])
         print("=========================================================")
 
-    pixels = [[0 for x in range(len(picross_constraints[0][0]))] for x in range(len(picross_constraints[0][1]))]
-    #pixels = [(255,255,255) for x in range(len(picross_constraints[0][0])*len(picross_constraints[0][1]))]
+    #pixels = [[0 for x in range(len(picross_constraints[0][0]))] for x in range(len(picross_constraints[0][1]))]
+    pixels = [(255,255,255) for x in range(len(picross_constraints[0][0])*len(picross_constraints[0][1]))]
     """
     for x in range(len(picross_constraints[0][1])):
         for y in range(len(picross_constraints[0][0])):
             pixels[x][y] = (255,255,255)
     """
 
+    index = -1
     for i in range(len(color_list)):
         y=-1
         for row in variable_arrayL[i]:
@@ -103,19 +60,14 @@ def color_picross_basic_solver(picross_constraints, color_list):
             x=-1
             for variable in row:
                 x+=1
-                #index+=1
+                index+=1
                 if(variable.get_assigned_value()):
-                    pixels[y][x] = i+1
-                    #pixels[index] = (color_list[i][0],color_list[i][1],color_list[i][2])
-
-    palette = list()
-    palette.append(color_toLong(255,255,255)) #white
-    for color in color_list:
-        palette.append(color_toLong(color[0],color[1],color[2]))
+                    #pixels[y][x] = i+1
+                    pixels[index] = (color_list[i][0],color_list[i][1],color_list[i][2])
 
 
 
-    write_BMP("out.bmp", len(variable_arrayL[0][0]), len(variable_arrayL[0]), palette, pixels)
+    write_to_file("out.pnm", len(variable_arrayL[0][0]), len(variable_arrayL[0]), pixels)
 
 
 
