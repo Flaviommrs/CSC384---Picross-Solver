@@ -11,7 +11,6 @@ def write_BMP(filename, width, height, palette, bitarray):
     # open file
     f = open(filename, "wb")
 
-    '''
     # write bitmap header
     f.write( bytes("BM",'UTF-8') )
     f.write( longToString( 54 + 256*4 + width*height ) )   # DWORD size in bytes of the file
@@ -28,25 +27,23 @@ def write_BMP(filename, width, height, palette, bitarray):
     f.write( longToString( 0 ) )    # DWORD ver pixels per meter (?)
     f.write( longToString( 256 ) )    # DWORD number of colors used = 256
     f.write( longToString( len(palette) ) )    # DWORD number of "import colors = len( self.palette )
-    '''
+
     # write bitmap palette
-    f.write (longToString(255))
-    '''
     for clr in palette:
       f.write( longToString( clr ) )
-    '''
-    '''
+
+
     for i in range( len(palette), 256 ):
       f.write( longToString( 0 ) )
 
     # write pixels
     for row in bitarray:
       for pixel in row:
-        f.write( shortToString(pixel) )
+        f.write( bytes(chr(pixel),'UTF-8') )
       padding = ( 4 - len(row) % 4 ) % 4
       for i in range(padding):
-        f.write( shortToString(0) )
-    '''
+        f.write( b'\x00' )
+
     # close file
     f.close()
 
@@ -91,7 +88,7 @@ def color_picross_basic_solver(picross_constraints, color_list):
         print_Picross(variable_arrayL[i])
         print("=========================================================")
 
-    pixels = [[color_toLong(255,255,255) for x in range(len(picross_constraints[0][0]))] for x in range(len(picross_constraints[0][1]))]
+    pixels = [[0 for x in range(len(picross_constraints[0][0]))] for x in range(len(picross_constraints[0][1]))]
     #pixels = [(255,255,255) for x in range(len(picross_constraints[0][0])*len(picross_constraints[0][1]))]
     """
     for x in range(len(picross_constraints[0][1])):
@@ -108,7 +105,7 @@ def color_picross_basic_solver(picross_constraints, color_list):
                 x+=1
                 #index+=1
                 if(variable.get_assigned_value()):
-                    pixels[y][x] = color_toLong(color_list[i][0],color_list[i][1],color_list[i][2])
+                    pixels[y][x] = i+1
                     #pixels[index] = (color_list[i][0],color_list[i][1],color_list[i][2])
 
     palette = list()
@@ -146,7 +143,7 @@ if __name__ == "__main__":
     #5x5 X
     #board = [[[1,1],[1,1],[3],[1,1],[1,1]],[[1,1],[3],[1],[3],[1,1]]]
     #5x7 turtle
-    #board = [[[1,1],[3,1],[3,2],[3,1],[1,1]],[[1,1],[3],[3],[3],[1,1],[3],[1]]]
+    board = [[[1,1],[3,1],[3,2],[3,1],[1,1]],[[1,1],[3],[3],[3],[1,1],[3],[1]]]
     #7x6 strange face
     #board = [[[1,2],[2,1],[2,1],[1,1],[1,1,1],[2,1],[2,3]],[[3,3],[2,2],[0],[1,2,1],[1,1],[6]]]
     #8x7 strange face (same as 7x6, with an empty row and column)
@@ -200,6 +197,9 @@ if __name__ == "__main__":
     board2 = [cols2,rows2]
     boards = [board1,board2]
     colors = [[255,0,0],[0,0,255]]
+
+    boards = [board]
+    colors = [[255,0,0]]
 
     color_picross_basic_solver(boards,colors)
 
