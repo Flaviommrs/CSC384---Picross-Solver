@@ -9,18 +9,20 @@ def write_to_file(filename, width, height, pixels):
     f = open(filename, "wb")
 
     f.write(b"P3\n")
-    f.write(b"#TESTING PNM FORMAT FOR SAVING")
-    f.write(bytes(str(width) + str(height),'UTF-8'))
+    f.write(b"# TESTING PNM FORMAT FOR SAVING")
+    f.write(b"\n")
+    f.write(b"# BLABLABLA")
+    f.write(b"\n")
+    f.write(bytes(str(width) + " " + str(height),'UTF-8'))
     f.write(b"\n")
     f.write(bytes(str(256),'UTF-8'))
     f.write(b"\n")
     i=-1
     for pixel in pixels:
         i+=1
-        if(i>width):
+        if(i==width):
             i=0
-            f.write(b"\n")
-        f.write(bytes(str(pixel[0])+str(" ")+str(pixel[1])+str(" ")+str(pixel[2]),'UTF-8'))
+        f.write(bytes(str(pixel[0])+str(" ")+str(pixel[1])+str(" ")+str(pixel[2])+" ",'UTF-8'))
 
     f.close()
 
@@ -52,8 +54,8 @@ def color_picross_basic_solver(picross_constraints, color_list):
             pixels[x][y] = (255,255,255)
     """
 
-    index = -1
     for i in range(len(color_list)):
+        index = -1
         y=-1
         for row in variable_arrayL[i]:
             y+=1
@@ -149,9 +151,6 @@ if __name__ == "__main__":
     board2 = [cols2,rows2]
     boards = [board1,board2]
     colors = [[255,0,0],[0,0,255]]
-
-    boards = [board]
-    colors = [[255,0,0]]
 
     color_picross_basic_solver(boards,colors)
 
