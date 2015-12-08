@@ -7,6 +7,7 @@ from cspbase import *
 import itertools
 import propagators as my_propagators
 import copy
+from propagators import *
 
 def all_combinations_aux(sum, buckets):
     if(sum == 0):
@@ -168,4 +169,82 @@ def picross_model(picross_constraints):
         picross_csp.add_constraint(c)
 
     return picross_csp, variable_array
+
+def write_to_file(filename, width, height, pixels):
+    f = open(filename, "wb")
+
+    f.write(b"P3\n")
+    f.write(b"# TESTING PNM FORMAT FOR SAVING")
+    f.write(b"\n")
+    f.write(b"# BLABLABLA")
+    f.write(b"\n")
+    f.write(bytes(str(width) + " " + str(height),'UTF-8'))
+    f.write(b"\n")
+    f.write(bytes(str(256),'UTF-8'))
+    f.write(b"\n")
+    i=-1
+    for pixel in pixels:
+        i+=1
+        if(i==width):
+            i=0
+        f.write(bytes(str(pixel[0])+str(" ")+str(pixel[1])+str(" ")+str(pixel[2])+" ",'UTF-8'))
+
+    f.close()
+
+
+def rgba(r, g, b, a):
+    return (struct.pack("B",r) + struct.pack("B",g) + struct.pack("B",b) + struct.pack("B",a))
+
+#this solver is not for color picrosses you find normally. It solves the different collors as separate problems and then it merges the results.
+def color_picross_basic_solver(picross_constraints, color_list):
+    cspL = list()
+    variable_arrayL = list()
+    for i in range(len(color_list)):
+        csp, variable_array = picross_model(picross_constraints[i])
+        cspL.append(csp)
+        variable_arrayL.append(variable_array)
+        solver  = BT(cspL[i])
+        print("=========================================================")
+        print("Using GAC")
+        solver.bt_search(prop_GAC)
+        print("Solved for color " + str(i))
+        print_Picross(variable_arrayL[i])
+        print("=========================================================")
+
+    #pixels = [[0 for x in range(len(picross_constraints[0][0]))] for x in range(len(picross_constraints[0][1]))]
+    pixels = [(255,255,255) for x in range(len(picross_constraints[0][0])*len(picross_constraints[0][1]))]
+    """
+    for x in range(len(picross_constraints[0][1])):
+        for y in range(len(picross_constraints[0][0])):
+            pixels[x][y] = (255,255,255)
+    """
+
+    for i in range(len(color_list)):
+        index = -1
+        y=-1
+        for row in variable_arrayL[i]:
+            y+=1
+            x=-1
+            for variable in row:
+                x+=1
+                index+=1
+                if(variable.get_assigned_value()):
+                    #pixels[y][x] = i+1
+                    pixels[index] = (color_list[i][0],color_list[i][1],color_list[i][2])
+
+
+
+    write_to_file("out.pnm", len(variable_arrayL[0][0]), len(variable_arrayL[0]), pixels)
+
+
+
+def print_Picross(variables):
+    for row in variables:
+        #print(["T" if var.get_assigned_value() == True else "F" for var in row])
+        for variable in row:
+            if(variable.get_assigned_value()):
+                print("XX",end="")
+            else:
+                print("  ",end="")
+        print("")
 
