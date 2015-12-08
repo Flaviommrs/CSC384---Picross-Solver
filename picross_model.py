@@ -191,7 +191,7 @@ def write_to_file(filename, width, height, pixels):
     f.write(b"P3\n")
     f.write(b"# TESTING PNM FORMAT FOR SAVING")
     f.write(b"\n")
-    f.write(b"# BLABLABLA")
+    f.write(b"# Authors: Rodrigo Guimaraes and Flavio Matheus")
     f.write(b"\n")
     f.write(bytes(str(width) + " " + str(height),'UTF-8'))
     f.write(b"\n")
