@@ -1,6 +1,5 @@
-
 '''
-Construct and return a picross CSP models.
+Construct and return a picross CSP model.
 '''
 
 from cspbase import *
@@ -9,6 +8,7 @@ import propagators as my_propagators
 import copy
 from propagators import *
 
+#Auxiliar function to all_combinations
 def all_combinations_aux(sum, buckets):
     if(sum == 0):
         yield buckets
@@ -26,6 +26,9 @@ def all_combinations_aux(sum, buckets):
                     yield result
             b1-=1
 
+#Given a list of buckets and a "sum" number, it yields all the possible combinations for putting "sum" objects into the buckets.
+#In other words, yield all the possible solutions for putting sum distinct balls into buckets.
+#FUTURE IMPLEMENTATION: Use a list of integers instead of a list of lists for buckets.
 def all_combinations(sum, buckets):
     for combination in all_combinations_aux(sum,buckets):
         for bucket in combination:
@@ -33,13 +36,23 @@ def all_combinations(sum, buckets):
                 bucket.append(0)
         yield combination
 
+#returns a picross_model given an input board
 def picross_model(picross_constraints):
     '''
-    DOCUMENT PICROSS MODEL
+    Returns a variable array, split by lines, with all the variables, each one corresponding to a cell in a picross board.
+
+    As input, it expects a list representing the board, as follows:
+        board = [cols, rows]
+    Where cols is a list of the constraints for the columns:
+        cols = [[1],[2,1],[0]]
+    And rows is a list of the constraints for the lines:
+        rows = [[1],[2,1],[0]]
     '''
+    #True represents painted, false represents blank
     dom = [True,False]
 
 
+    #Create all the variables
     variable_array = []
     vars = []
     for i in range(len(picross_constraints[1])):
@@ -52,7 +65,7 @@ def picross_model(picross_constraints):
 
     cons = []
 
-    #constraints for columns
+    #Constraints for columns
     column_list = picross_constraints[0]
     line_list = picross_constraints[1]
 
@@ -101,15 +114,12 @@ def picross_model(picross_constraints):
                 global_offset+=local_offset
                 bucket_num+=1
 
-            #print(list_initial_sat_copy)
             sat_tuples.append(tuple(list_initial_sat_copy))
 
         con.add_satisfying_tuples(sat_tuples)
         cons.append(con)
-        #print("did a constraint for column")
 
     #constraints for lines
-
     for celli in range(len(picross_constraints[1])):
         line = []
         for cellj in range(len(picross_constraints[0])):
@@ -155,21 +165,26 @@ def picross_model(picross_constraints):
                 global_offset+=local_offset
                 bucket_num+=1
 
-            #print(list_initial_sat_copy)
             sat_tuples.append(tuple(list_initial_sat_copy))
 
         con.add_satisfying_tuples(sat_tuples)
-        #print("sat_tuples:")
-        #print(sat_tuples)
         cons.append(con)
-        #print("did a constraint for line")
 
+    #creates the CSP variable
     picross_csp = CSP("Picross Solver Model", vars)
+    #add the constraints to the CSP
     for c in cons:
         picross_csp.add_constraint(c)
 
     return picross_csp, variable_array
-
+'''
+writes the input to an image file.
+Expects:
+    filename: string with the file name.
+    width: width in pixels of the image
+    height: height in pixels of the image
+    pixels: list of RGB tuples/lists with values between 0 and 255 for Red, Green and Blue, in that order.
+'''
 def write_to_file(filename, width, height, pixels):
     f = open(filename, "wb")
 
@@ -191,11 +206,31 @@ def write_to_file(filename, width, height, pixels):
 
     f.close()
 
-
+#pack and rgb-alpha standard into a byte fashion. Currently not used, since alpha is not being used.
 def rgba(r, g, b, a):
     return (struct.pack("B",r) + struct.pack("B",g) + struct.pack("B",b) + struct.pack("B",a))
 
-#this solver is not for color picrosses you find normally. It solves the different collors as separate problems and then it merges the results.
+'''
+This functions creates all the needed models and solves them to compose a color image with the result of a colored picross puzzle.
+
+Expects:
+        -picross_constraints: a list of boards, where each board is represented by a list, as follows:
+            board = [cols, rows]
+        Where cols is a list of the constraints for the columns:
+            cols = [[1],[2,1],[0]]
+        And rows is a list of the constraints for the lines:
+            rows = [[1],[2,1],[0]]
+
+        -color_list: a list of lists, where each inner list represents a color in RGB
+            color_list = [red,green,blue]
+            Where:
+            red =   [255,0,0]
+            green = [0,255,0]
+            blue =  [0,0,255]
+
+NOTE1: it is supposed that len(color_list) = len(picross_constraints)
+NOTE2: this solver is not for color picrosses you find normally. It solves the different colors as separate problems and then it merges the results.
+'''
 def color_picross_basic_solver(picross_constraints, color_list):
     cspL = list()
     variable_arrayL = list()
@@ -211,40 +246,33 @@ def color_picross_basic_solver(picross_constraints, color_list):
         print_Picross(variable_arrayL[i])
         print("=========================================================")
 
-    #pixels = [[0 for x in range(len(picross_constraints[0][0]))] for x in range(len(picross_constraints[0][1]))]
     pixels = [(255,255,255) for x in range(len(picross_constraints[0][0])*len(picross_constraints[0][1]))]
-    """
-    for x in range(len(picross_constraints[0][1])):
-        for y in range(len(picross_constraints[0][0])):
-            pixels[x][y] = (255,255,255)
-    """
 
     for i in range(len(color_list)):
         index = -1
-        y=-1
         for row in variable_arrayL[i]:
-            y+=1
-            x=-1
             for variable in row:
-                x+=1
                 index+=1
                 if(variable.get_assigned_value()):
-                    #pixels[y][x] = i+1
                     pixels[index] = (color_list[i][0],color_list[i][1],color_list[i][2])
-
-
 
     write_to_file("out.pnm", len(variable_arrayL[0][0]), len(variable_arrayL[0]), pixels)
 
 
+'''
+Command line printer for monochromatic picrosses.
+Expects a variable_array, that contains:
+    variable_array = [row_1,row_2, ... ,row_n]
+    Where:
+        row_n = [var1,var2,...,varN]
 
+NOTE: It is using "XX" for a painted space and "  " for a blank space, since this is closer to being square than a single character.
+'''
 def print_Picross(variables):
     for row in variables:
-        #print(["T" if var.get_assigned_value() == True else "F" for var in row])
         for variable in row:
             if(variable.get_assigned_value()):
                 print("XX",end="")
             else:
                 print("  ",end="")
         print("")
-

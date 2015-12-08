@@ -7,7 +7,7 @@ import struct, array
 
 if __name__ == "__main__":
 
-    # Picross board: First the columns list, Second the row list
+    # Picross board: First the columns list, Second the row list. Some boards are put directly in the board list, others use rows and cols as auxiliary variables. Please pay attention to this when testing boards.
     #GOOMBA
     #board = [[[5,2],[9,3],[1,2,1,3],[1,1,5],[3,1,1,3],[4,2,1,1,2],[6,2,1,1],[9,1,1],[6,2,1,1],[4,2,1,1,2],[3,1,1,3],[1,1,5],[1,2,1,3],[9,3],[5,2]],[[5],[7],[13],[1,7,1],[1,3,1],[2,5,2],[2,1,1,1,2],[3,3,3],[15],[2,2],[13],[1,1],[4,4],[15],[6,6]]]
     #EDGE
@@ -62,40 +62,11 @@ if __name__ == "__main__":
     #rows = [[7], [11], [13], [15], [15], [17], [3,5,3], [2,3,2], [3,2,1,2,3], [4,2,2,4], [5,5], [5,5], [6,3,6], [5,1,5], [3,3], [3,1,1,3], [1,2,2,1], [1,5,1], [2,2], [7]]
     #cols = [[2], [4], [4], [9], [5,6], [5,5], [5,2,7], [5,2,2,1], [6,1,2,1], [7,2,1], [8,1,1,1], [9,2,1,1], [8,1,1,1], [7,2,1], [6,1,2,1], [5,2,2,1], [5,2,7], [5,5], [5,6], [9], [4], [4], [2]]
 
+    #THIS LINE SHOULD BE COMMENTED ONLY IF YOU ARE NOT USING THE ROWS AND COLS AUXILIARY VARIABLES.
     board = [cols,rows]
 
+    #This is used only on colored picrosses. It stays here just to have the if condition below unchanged.
     boards = list()
-    #picross basic color model
-    '''
-    rows1 = [[0],[1],[0],[0],[1]]
-    cols1 = [[0],[0],[0],[0],[1],[0],[1]]
-    board1 = [cols1,rows1]
-    rows2 = [[2],[2,1],[4],[2],[0]]
-    cols2 = [[1],[2],[2],[2],[2],[2],[0]]
-    board2 = [cols2,rows2]
-    boards = [board1,board2]
-    colors = [[255,0,0],[0,0,255]]
-    '''
-
-    #   color mario
-    '''
-    #brown
-    cols1 = [[3],[1,1],[3],[1,1],[0],[0],[2,1],[2],[1],[1],[0]]
-    rows1 = [[0],[0],[3,1],[1,1,1],[1,2,1],[2,4],[0]]
-    board1 = [cols1,rows1]
-    #yellow
-    cols2 = [[0],[2],[2],[1,2],[5],[5],[1,1],[2,1],[2,1],[2],[1]]
-    rows2 = [[0],[0],[2,1],[1,3,3],[1,3,3],[4],[7]]
-    board2 = [cols2,rows2]
-    #red
-    cols3 = [[0],[1],[2],[2],[2],[2],[2],[1],[1],[1],[0]]
-    rows3 = [[5],[9],[0],[0],[0],[0],[0]]
-    board3 = [cols3,rows3]
-
-    boards = [board1,board2,board3]
-
-    colors = [[128,0,0],[255,255,0],[255,0,0]]
-    '''
 
     if len(boards) > 1:
         color_picross_basic_solver(boards,colors)
@@ -108,5 +79,3 @@ if __name__ == "__main__":
         print("Solution")
         print_Picross(variable_array)
         print("=========================================================")
-    
-
