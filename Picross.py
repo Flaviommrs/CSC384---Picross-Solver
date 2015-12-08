@@ -2,7 +2,7 @@ __author__ = 'FlavioMatheus'
 
 from propagators import *
 from cspbase import *
-from sudoku_csp import *
+from picross_model import *
 import struct, array
 
 def write_to_file(filename, width, height, pixels):
